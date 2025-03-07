@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import locators as loc
+import data
+from data import URLCollection
 
 
 #  Фикстура для инициализации веб-драйвера Chrome, которая создает
@@ -19,44 +22,38 @@ def driver():
 # Так же фикстура содержит явное ожидание загрузки контейнера меню
 @pytest.fixture
 def open_main_page(driver):
-    driver.get("https://stellarburgers.nomoreparties.site/")
+    driver.get(URLCollection.HOME_PAGE)
 
     WebDriverWait(driver, 1).until(
-        EC.visibility_of_element_located((By.CLASS_NAME, "BurgerIngredients_ingredients__menuContainer__Xu3Mo"))
+        EC.visibility_of_element_located((By.XPATH, loc.INGREDIENTS_MENU_CONTAINER_CLASS))
     )
-
-    yield driver
 
 
 # Фикстура которая открывает страницу регистрации
 # Так же фикстура содержит явное ожидание загрузки окна логина
 @pytest.fixture
 def open_registration_page(driver):
-    driver.get("https://stellarburgers.nomoreparties.site/register")
+    driver.get(URLCollection.REGISTRATION_PAGE)
 
     WebDriverWait(driver, 2).until(
-        EC.visibility_of_element_located((By.CLASS_NAME, "Auth_login__3hAey"))
+        EC.visibility_of_element_located((By.XPATH, loc.AUTH_REG_WINDOW_CLASS))
     )
-
-    yield driver
 
 
 # Фикстура которая открывает страницу логина и авторизует пользователя
 @pytest.fixture
 def authorize_user(driver):
-    driver.get("https://stellarburgers.nomoreparties.site/login")
+    driver.get(URLCollection.LOGIN_PAGE)
 
     WebDriverWait(driver, 2).until(
-        EC.visibility_of_element_located((By.CLASS_NAME, "Auth_login__3hAey"))
+        EC.visibility_of_element_located((By.XPATH, loc.AUTH_REG_WINDOW_CLASS))
     )
 
-    driver.find_element(By.XPATH, './/fieldset[1]/div/div/input').send_keys(
-        'anton_shikunov_19998@yandex.ru')
-    driver.find_element(By.XPATH, './/fieldset[2]/div/div/input[@name="Пароль"]').send_keys('qwerty')
-    driver.find_element(By.XPATH, './/button[text()="Войти"]').click()
+    driver.find_element(By.XPATH, loc.LOGIN_EMAIL_INPUT_FIELD).send_keys(
+        data.REGISTRATION_DATA['email'])
+    driver.find_element(By.XPATH, loc.LOGIN_PASSWORD_INPUT_FIELD).send_keys(data.REGISTRATION_DATA['password'])
+    driver.find_element(By.XPATH, loc.LOGIN_BUTTON).click()
     WebDriverWait(driver, 2).until(
         EC.visibility_of_element_located(
-            (By.CLASS_NAME, "BurgerIngredients_ingredients__menuContainer__Xu3Mo"))
+            (By.XPATH, loc.INGREDIENTS_MENU_CONTAINER_CLASS))
     )
-
-    yield driver
